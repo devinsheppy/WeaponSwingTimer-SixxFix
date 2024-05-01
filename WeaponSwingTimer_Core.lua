@@ -10,7 +10,7 @@ addon_data.core.all_timers = {
     addon_data.player, addon_data.target
 }
 
-local version = "7.2.5"
+local version = "7.2.6"
 
 local load_message = L["Thank you for installing WeaponSwingTimer Version"] .. " " .. version .. 
                      " " .. L["by WatchYourSixx! Use |cFFFFC300/wst|r for more options."]
@@ -663,13 +663,29 @@ addon_data.core.SpellHandler = function(unit, spell_id)
         if player_class == class then
             for spell_index, curr_spell_id in ipairs(spell_table) do
 				if spell_id == curr_spell_id then
-				
-                    if unit == "player" then
-                        addon_data.player.ResetMainSwingTimer()
-                    elseif unit == "target" then
-                        addon_data.target.ResetMainSwingTimer()
+                    -- add condition if warrior then check for cast time due to slam instant doesn't reset swing timer
+                    if player_class == 'Warrior' then
+                        local _, _, _, castTime, _, _ = GetSpellInfo(spell_id)
+                        if castTime == 0 then
+                            -- don't reset swing timer if cast time = 0
+                            return
+                        else
+                            if unit == "player" then
+                                addon_data.player.ResetMainSwingTimer()
+                            elseif unit == "target" then
+                                addon_data.target.ResetMainSwingTimer()
+                            else
+                                addon_data.utils.PrintMsg(L["Unexpected Unit Type in SpellHandler()."])
+                            end
+                        end
                     else
-                        addon_data.utils.PrintMsg(L["Unexpected Unit Type in SpellHandler()."])
+                        if unit == "player" then
+                            addon_data.player.ResetMainSwingTimer()
+                        elseif unit == "target" then
+                            addon_data.target.ResetMainSwingTimer()
+                        else
+                            addon_data.utils.PrintMsg(L["Unexpected Unit Type in SpellHandler()."])
+                        end
                     end
                 end
                 
