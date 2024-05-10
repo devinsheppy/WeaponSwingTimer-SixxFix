@@ -328,7 +328,8 @@ addon_data.hunter.OnUnitSpellCastSucceeded = function(unit, spell_id)
             end
 			if addon_data.hunter.is_spell_shoot(spell_id) then
 				new_range_speed, _, _, _, _, _ = UnitRangedDamage("player")
-				addon_data.hunter.range_speed = new_range_speed
+                -- for some reason shoot is slower than base speed, no modifiers. Seems to have an opposite effect of OG quiver speed
+				addon_data.hunter.range_speed = addon_data.hunter.base_speed * 1.15
 			end
         end
 

@@ -701,6 +701,7 @@ local function OnAddonLoaded(self)
     -- Any other misc operations that happen at the start
     addon_data.player.ZeroizeSwingTimers()
     addon_data.target.ZeroizeSwingTimers()
+    addon_data.hunter.OnInventoryChange()
 	
     if character_core_settings.welcome_message then	
 		addon_data.utils.PrintMsg(load_message)	
