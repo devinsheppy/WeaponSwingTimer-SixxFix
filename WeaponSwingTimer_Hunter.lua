@@ -91,7 +91,6 @@ addon_data.hunter.casting = false
 addon_data.hunter.casting_auto = false
 addon_data.hunter.range_cast_speed_modifer = 1
 
-addon_data.hunter.range_weapon_id = 0
 addon_data.hunter.has_moved = false
 
 -- handling of stopping auto timer from starting
@@ -143,15 +142,7 @@ end
 addon_data.hunter.OnInventoryChange = function()
 	local _, class, _ = UnitClass("player")
 	if (class == "HUNTER" or class == "MAGE" or class == "PRIEST" or class == "WARLOCK") then
-		addon_data.hunter.range_weapon_id = GetInventoryItemID("player", 18)
-		local weapon_id = addon_data.hunter.range_weapon_id
-		
-		range_speed, _, _, _, _, _ = UnitRangedDamage("player")
-		if (weapon_id == nil) or (addon_data.ranged_DB.item_ids[weapon_id] == nil) or (range_speed == 0) then
-			addon_data.hunter.base_speed = 1
-		else
-			addon_data.hunter.base_speed = addon_data.ranged_DB.item_ids[weapon_id].base_speed
-		end
+		addon_data.hunter.base_speed = addon_data.GetRangedBaseSpeed()
 	end
 end	
 
@@ -159,8 +150,7 @@ end
 addon_data.hunter.FeignDeath = function()
     addon_data.hunter.last_shot_time = GetTime()
 	if not addon_data.hunter.FeignFullReset then
-		range_speed, _, _, _, _, _ = UnitRangedDamage("player")
-		addon_data.hunter.range_speed = range_speed + 0.15
+		addon_data.hunter.range_speed = addon_data.GetRangedBaseSpeed() + 0.15
 		addon_data.hunter.FeignFullReset = true
 	end
     addon_data.hunter.ResetShotTimer()
@@ -171,14 +161,7 @@ addon_data.hunter.UpdateRangeCastSpeedModifier = function()
 	local _, class, _ = UnitClass("player")
 	
 	if addon_data.hunter.base_speed == 1 and (class == "HUNTER" or class == "MAGE" or class == "PRIEST" or class == "WARLOCK") then 
-		addon_data.hunter.range_weapon_id = GetInventoryItemID("player", 18)
-		local weapon_id = addon_data.hunter.range_weapon_id
-		-- added case for if no ranged equipped
-		if weapon_id == nil then
-			addon_data.hunter.base_speed = 1
-		else
-			addon_data.hunter.base_speed = addon_data.ranged_DB.item_ids[weapon_id].base_speed
-		end
+		addon_data.hunter.base_speed = addon_data.GetRangedBaseSpeed()
 	else
 		local range_speed, _, _, _, _, percent = UnitRangedDamage("player")
 		-- added case for if range speed returns nil or 0
@@ -327,7 +310,8 @@ addon_data.hunter.OnUnitSpellCastSucceeded = function(unit, spell_id)
         -- If the spell is Auto Shot then reset the shot timer
         if addon_data.hunter.shot_spell_ids[spell_id] then
             spell_name = addon_data.hunter.shot_spell_ids[spell_id].spell_name
-			if spell_name == L["Feign Death"] or spell_name == L["Trueshot Aura"] then
+            -- reset if aimed shot is cast? true to current in-game
+			if spell_name == L["Feign Death"] or spell_name == L["Aimed Shot"] then
 				if spell_name == L["Feign Death"] then
 					addon_data.hunter.FeignStatus = true
 				end
@@ -522,7 +506,7 @@ addon_data.hunter.InitializeVisuals = function()
     -- Create the shot bar text
     frame.shot_bar_text = frame:CreateFontString(nil,"OVERLAY")
     frame.shot_bar_text:SetFont("Fonts/FRIZQT__.ttf", settings.fontsize)
-    frame.shot_bar_text:SetJustifyV("CENTER")
+    frame.shot_bar_text:SetJustifyV("MIDDLE")
     frame.shot_bar_text:SetJustifyH("CENTER")
     -- Show it off
     addon_data.hunter.UpdateVisualsOnSettingsChange()
