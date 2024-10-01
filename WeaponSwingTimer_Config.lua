@@ -11,7 +11,7 @@ end
 addon_data.config.InitializeVisuals = function()
 
     -- Add the parent panel
-    addon_data.config.config_parent_panel = CreateFrame("Frame", "MyFrame", UIParent)
+    addon_data.config.config_parent_panel = CreateFrame("Frame", "MyWSTFrame", UIParent)
     local panel = addon_data.config.config_parent_panel
     panel:SetSize(1, 1)
     panel.global_panel = addon_data.config.CreateConfigPanel(panel)
@@ -25,10 +25,15 @@ addon_data.config.InitializeVisuals = function()
 
     panel.name = "WeaponSwingTimer"
     panel.default = addon_data.config.OnDefault
-    InterfaceOptions_AddCategory(panel)
+    --InterfaceOptions_AddCategory(panel)
+	
+	local wst_category = Settings.RegisterCanvasLayoutCategory(panel, panel.name);
+	wst_category.ID = panel.name
+	panel.category = wst_category
+	Settings.RegisterAddOnCategory(wst_category);
     
     -- Add the melee panel
-    panel.config_melee_panel = CreateFrame("Frame", nil, panel)
+    panel.config_melee_panel = CreateFrame("Frame", nil, UIParent)	
     panel.config_melee_panel:SetSize(1, 1)
     panel.config_melee_panel.player_panel = addon_data.player.CreateConfigPanel(panel.config_melee_panel)
     panel.config_melee_panel.player_panel:SetPoint('TOPLEFT', 0, 0)
@@ -39,10 +44,14 @@ addon_data.config.InitializeVisuals = function()
     panel.config_melee_panel.name = L["Melee Settings"]
     panel.config_melee_panel.parent = panel.name
     panel.config_melee_panel.default = addon_data.config.OnDefault
-    InterfaceOptions_AddCategory(panel.config_melee_panel)
-    
+    --InterfaceOptions_AddCategory(panel.config_melee_panel)
+	
+	Settings.RegisterCanvasLayoutSubcategory(wst_category, panel.config_melee_panel, panel.config_melee_panel.name)
+    panel.config_melee_panel.category = wst_category
+	
     -- Add the hunter panel
-    panel.config_hunter_panel = CreateFrame("Frame", nil, panel)
+    panel.config_hunter_panel = CreateFrame("Frame", nil, UIParent)
+	panel.config_hunter_panel.category = wst_category
     panel.config_hunter_panel:SetSize(1, 1)
     panel.config_hunter_panel.hunter_panel = addon_data.hunter.CreateConfigPanel(panel.config_hunter_panel)
     panel.config_hunter_panel.hunter_panel:SetPoint('TOPLEFT', 0, 0)
@@ -53,9 +62,10 @@ addon_data.config.InitializeVisuals = function()
     panel.config_hunter_panel.name = L["Hunter & Wand Settings"]
     panel.config_hunter_panel.parent = panel.name
     panel.config_hunter_panel.default = addon_data.config.OnDefault
-    InterfaceOptions_AddCategory(panel.config_hunter_panel)
-    
-
+    --InterfaceOptions_AddCategory(panel.config_hunter_panel)
+	
+	Settings.RegisterCanvasLayoutSubcategory(wst_category, panel.config_hunter_panel, panel.config_hunter_panel.name)
+    panel.config_hunter_panel.category = wst_category
 end
 
 addon_data.config.TextFactory = function(parent, text, size)
@@ -114,14 +124,21 @@ addon_data.config.EditBoxFactory = function(g_name, parent, title, w, h, enter_f
 end
 
 addon_data.config.SliderFactory = function(g_name, parent, title, min_val, max_val, val_step, func)
-    local slider = CreateFrame("Slider", addon_name .. g_name, parent, "OptionsSliderTemplate")
+    --local slider = CreateFrame("Slider", addon_name .. g_name, parent, "OptionsSliderTemplate")
+	local slider = CreateFrame("Slider", addon_name .. g_name, parent)
     local editbox = CreateFrame("EditBox", "$parentEditBox", slider, "InputBoxTemplate")
     slider:SetMinMaxValues(min_val, max_val)
     slider:SetValueStep(val_step)
-    slider.text = _G[addon_name .. g_name .. "Text"]
+    --slider.text = _G[addon_name .. g_name .. "Text"]
+	slider.text = slider:CreateFontString(nil, "ARTWORK")
+	slider.text:SetFont("Fonts\\ARIALN.ttf", 13, "OUTLINE")
     slider.text:SetText(title)
-    slider.textLow = _G[addon_name .. g_name .. "Low"]
-    slider.textHigh = _G[addon_name .. g_name .. "High"]
+    --slider.textLow = _G[addon_name .. g_name .. "Low"]
+	slider.textLow = slider:CreateFontString(nil, "ARTWORK")
+	slider.textLow:SetFont("Fonts\\ARIALN.ttf", 13, "OUTLINE")
+    --slider.textHigh = _G[addon_name .. g_name .. "High"]
+	slider.textHigh = slider:CreateFontString(nil, "ARTWORK")
+	slider.textHigh:SetFont("Fonts\\ARIALN.ttf", 13, "OUTLINE")
     slider.textLow:SetText(floor(min_val))
     slider.textHigh:SetText(floor(max_val))
     slider.textLow:SetTextColor(0.8,0.8,0.8)

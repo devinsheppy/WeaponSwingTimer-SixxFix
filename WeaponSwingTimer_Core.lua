@@ -748,8 +748,9 @@ SLASH_WEAPONSWINGTIMER_CONFIG1 = "/WeaponSwingTimer"
 SLASH_WEAPONSWINGTIMER_CONFIG2 = "/weaponswingtimer"
 SLASH_WEAPONSWINGTIMER_CONFIG3 = "/wst"
 SlashCmdList["WEAPONSWINGTIMER_CONFIG"] = function(option)
-    InterfaceOptionsFrame_OpenToCategory("WeaponSwingTimer")
-    InterfaceOptionsFrame_OpenToCategory("WeaponSwingTimer")
+    --InterfaceOptions_OpenToCategory("WeaponSwingTimer")
+    --InterfaceOptions_OpenToCategory("WeaponSwingTimer")
+	Settings.OpenToCategory("WeaponSwingTimer");
 end
 
 -- Setup the core of the addon (This is like calling main in C)
